@@ -61,8 +61,10 @@ class Datasource:
 
         Parameters
         ----------
-        dataset : quantipy.Dataset
-            A Quantipy Dataset object.
+        meta : json object
+            Meta data (in quantipy form).
+        data : string
+            A CSV file with the dataset's data.
 
         Returns
         -------
