@@ -1,7 +1,31 @@
-# from .client import Client
 
 
 class Datasource:
+    """A class that represents a Datasmoothie datasource.
+
+    This is used
+    to make it easy to upload data, update data and do any operation
+    the user needs to do on a dataset.
+
+    Parameters
+    ----------
+    client : datasmoothie.Client
+        The client that will interface with the API.
+    name : string
+        Name of the Datasource.
+    primaryKey : integer
+        The identifier for the datasource.
+
+    Attributes
+    ----------
+    _name : string
+        Name of the datasource.
+    _client : datasmoothie.Client
+        The client that will interface with the API.
+    _pk : integer
+        Identifier of the datasource in Datasmoothie.
+
+    """
 
     def __init__(self, client, name, primaryKey):
         """Initialise a Datasource.
@@ -32,7 +56,7 @@ class Datasource:
         """
         return self._name
 
-    def update(self, dataset):
+    def update_meta_and_data(self, meta, data):
         """Update the remote datasource with new meta-data and data.
 
         Parameters
@@ -40,12 +64,17 @@ class Datasource:
         dataset : quantipy.Dataset
             A Quantipy Dataset object.
 
+        Returns
+        -------
+        type
+            The Json object the API returned.
         """
         payload = {
-            'meta': dataset.meta(),
-            'data': dataset.data()
+            'meta': meta,
+            'data': data
         }
-        self._client.post_request('datasource/{}'.format(self._pk),
-                                  'meta_data',
-                                  data=payload
-                                  )
+        resp = self._client.post_request('datasource/{}'.format(self._pk),
+                                         'meta_data',
+                                         data=payload
+                                         )
+        return resp

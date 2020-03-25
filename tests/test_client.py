@@ -29,11 +29,12 @@ def test_get_datasource(token):
     assert isinstance(resp, Datasource)
 
 
-def test_update_datasource(token):
+def test_update_datasource(token, dataset_meta, dataset_data):
     client = Client(api_key=token)
     datasources = client.list_datasources()
     primary_key = datasources['results'][0]['pk']
     datasource = client.get_datasource(primary_key)
-    print(datasource)
-    # TODO: update datasouce with new data
-    assert True
+    meta = dataset_meta
+    data = dataset_data.to_csv()
+    resp = datasource.update_meta_and_data(meta=meta, data=data)
+    assert resp.status_code == 200
