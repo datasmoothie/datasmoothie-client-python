@@ -1,5 +1,5 @@
-from datasmoothie.client import Client
-from datasmoothie.datasource import Datasource
+from datasmoothie import Client
+from datasmoothie import Datasource
 # import quantipy as qp
 
 
@@ -38,3 +38,27 @@ def test_update_datasource(token, dataset_meta, dataset_data):
     data = dataset_data.to_csv()
     resp = datasource.update_meta_and_data(meta=meta, data=data)
     assert resp.status_code == 200
+
+
+def test_list_reports(token):
+    client = Client(api_key=token)
+    reports = client.list_reports()
+    assert 'results' in reports
+
+
+def test_get_report(token):
+    client = Client(api_key=token)
+    reports = client.list_reports()
+    pk = reports['results'][0]['pk']
+    result = client.get_report_elements(pk)
+    print(result)
+    assert 'elements' in result
+
+
+def test_create_report(token):
+    client = Client(api_key=token)
+    number_of_reports = client.list_reports()['count']
+    report = client.create_report(title="api created report")
+    assert client.list_reports()['count'] == number_of_reports + 1
+    report.delete()
+    assert client.list_reports()['count'] == number_of_reports

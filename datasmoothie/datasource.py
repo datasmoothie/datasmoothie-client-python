@@ -27,7 +27,7 @@ class Datasource:
 
     """
 
-    def __init__(self, client, name, primaryKey):
+    def __init__(self, client, name, primary_key):
         """Initialise a Datasource.
 
         Parameters
@@ -43,7 +43,7 @@ class Datasource:
         """
         self._name = name
         self._client = client
-        self._pk = primaryKey
+        self._pk = primary_key
 
     def name(self):
         """Get name of datasource.

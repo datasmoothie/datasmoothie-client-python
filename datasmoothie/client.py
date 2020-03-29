@@ -1,8 +1,9 @@
 import json
 import requests
 from .datasource import Datasource
+from .report import Report
 
-HOST = "www.datasmoothie.com/api2/"
+HOST = "www.datasmoothie.com/api2"
 
 
 class Client:
@@ -67,8 +68,9 @@ class Client:
         result = json.loads(result.content)
         return result
 
-    def post_request(self, resource, action=None, data=None):
+    def post_request(self, resource, action="", data={}):
         """Send a POST request to the API with a wrapper.
+
         This is used by other objects
         to call the API and not used by the users themselves.
 
@@ -97,6 +99,28 @@ class Client:
                                )
         return result
 
+    def delete_request(self, resource, primary_key):
+        """Send a delete request to the API.
+
+        Parameters
+        ----------
+        resource : string
+            Path location of the resource.
+        primary_key : string
+            The reports primary key, as reported by get reports.
+
+        Returns
+        -------
+        type
+            The response from the server.
+
+        """
+        base_url = "https://{}".format(HOST)
+        request_path = "{}/{}/{}".format(base_url, resource, primary_key)
+        result = requests.delete(request_path,
+                                 headers=self._get_headers())
+        return result
+
     def get_datasource(self, primary_key):
         """Create a datasource object from information fetched from the API.
 
@@ -114,7 +138,7 @@ class Client:
         result = self.get_request('datasource/{}'.format(primary_key))
         datasource = Datasource(client=self,
                                 name=result['name'],
-                                primaryKey=result['pk'])
+                                primary_key=result['pk'])
         return datasource
 
     def list_datasources(self):
@@ -129,4 +153,34 @@ class Client:
 
         """
         result = self.get_request('datasource')
+        return result
+
+    def create_report(self, title):
+        resp = self.post_request('report', data={"title": title})
+        resp = json.loads(resp.content)
+        report = Report(client=self,
+                        title=resp['title'],
+                        primary_key=resp['pk']
+                        )
+        print(report)
+        return report
+
+    def list_reports(self):
+        """Get a list of all reports this account has.
+
+        Returns
+        -------
+        type
+            List of reports in json form.
+
+        """
+        result = self.get_request('report')
+        return result
+
+    def get_report_meta(self, primary_key):
+        result = self.get_request('report/{}'.format(primary_key))
+        return result
+
+    def get_report_elements(self, primary_key):
+        result = self.get_request('reportElement/{}'.format(primary_key))
         return result
