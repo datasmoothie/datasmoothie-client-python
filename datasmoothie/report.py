@@ -40,18 +40,22 @@ class Report():
         """
         return self._client.get_request('reportElement/{}'.format(self._pk))
 
+    def update_content(self, new_elements):
+        """Update report elements with new element list.
 
-    def get_report_meta(self, primary_key):
-        result = self._client.get_request('report/{}'.format(primary_key))
-        return result
+        Parameters
+        ----------
+        new_elements : json
+            A json object which has an array of well formed elements.
 
-    def get_report_elements(self, primary_key):
-        result = self._client.get_request('reportElement/{}'.format(primary_key))
-        return result
+        Returns
+        -------
+        type
+            Meta data of the updated report.
 
-    def update_content(self, new_content):
+        """
         return self._client.put_request('reportElement/{}'.format(self._pk),
-                                        data=new_content
+                                        data=new_elements
                                         )
 
     def delete(self):

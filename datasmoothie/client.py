@@ -165,6 +165,19 @@ class Client:
         return result
 
     def create_report(self, title):
+        """Create a report/dashboard in Datasmoothie.
+
+        Parameters
+        ----------
+        title : string
+            Repor title. This will be displayed at the top of the report.
+
+        Returns
+        -------
+        type
+            The created report with both meta and content (elements).
+
+        """
         resp = self.post_request('report', data={"title": title})
         resp = json.loads(resp.content)
         report = Report(client=self,
@@ -187,14 +200,58 @@ class Client:
         return result
 
     def get_report_meta(self, primary_key):
+        """Met meta data for the report.
+
+        This includes the title, subtitle, slug and so on but doesn't
+        include the contents themselves. Get thos with get_report_elements.
+
+        Parameters
+        ----------
+        primary_key : int
+
+        Returns
+        -------
+        type
+            Returns json object with all the meta data of the report.
+
+        """
         result = self.get_request('report/{}'.format(primary_key))
         return result
 
     def get_report_elements(self, primary_key):
+        """Get the elements of the report (the content).
+
+        The elements are the charts, text, images and so on of the report.
+
+        Parameters
+        ----------
+        primary_key : int
+
+        Returns
+        -------
+        type
+            A json object which is an array with all the elements.
+
+        """
         result = self.get_request('reportElement/{}'.format(primary_key))
         return result
 
     def get_report(self, primary_key):
+        """Get datasmoothie report.
+
+        This creates a wrapper Report object and fetches both the
+        meta data and the elements array (content).
+
+        Parameters
+        ----------
+        primary_key : type
+
+        Returns
+        -------
+        type
+            Datasmoothie Report object.
+
+        """
         meta = self.get_report_meta(primary_key)
         elements = self.get_report_elements(primary_key)
         report = Report(self, meta['title'], elements['elements'], primary_key)
