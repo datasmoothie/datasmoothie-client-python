@@ -99,6 +99,15 @@ class Client:
                                )
         return result
 
+    def put_request(self, resource, data):
+        base_url = "https://{}".format(HOST)
+        request_path = "{}/{}".format(base_url, resource)
+        result = requests.put(request_path,
+                              headers=self._get_headers(),
+                              json=json.dumps(data)
+                              )
+        return result
+
     def delete_request(self, resource, primary_key):
         """Send a delete request to the API.
 
