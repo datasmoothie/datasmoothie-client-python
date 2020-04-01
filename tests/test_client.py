@@ -1,5 +1,6 @@
 from datasmoothie import Client
 from datasmoothie import Datasource
+from datasmoothie import Report
 # import quantipy as qp
 
 
@@ -46,13 +47,22 @@ def test_list_reports(token):
     assert 'results' in reports
 
 
+def test_get_report_meta(token):
+    client = Client(api_key=token)
+    reports = client.list_reports()
+    pk = reports['results'][0]['pk']
+    result = client.get_report_meta(pk)
+    print(result)
+    assert 'pk' in result
+
 def test_get_report(token):
     client = Client(api_key=token)
     reports = client.list_reports()
     pk = reports['results'][0]['pk']
-    result = client.get_report_elements(pk)
-    print(result)
-    assert 'elements' in result
+    report = client.get_report(pk)
+    print(report._title)
+    print(report._elements)
+    assert isinstance(report, Report)
 
 
 def test_create_report(token):

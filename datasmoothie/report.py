@@ -20,9 +20,10 @@ class Report():
 
     """
 
-    def __init__(self, client, title, primary_key=None):
+    def __init__(self, client, title, elements, primary_key=None):
         self._client = client
         self._title = title
+        self._elements = elements
         self._pk = primary_key
 
     def get_content(self):
@@ -38,6 +39,20 @@ class Report():
 
         """
         return self._client.get_request('reportElement/{}'.format(self._pk))
+
+
+    def get_report_meta(self, primary_key):
+        result = self._client.get_request('report/{}'.format(primary_key))
+        return result
+
+    def get_report_elements(self, primary_key):
+        result = self._client.get_request('reportElement/{}'.format(primary_key))
+        return result
+
+    def update_content(self, new_content):
+        return self._client.put_request('reportElement/{}'.format(self._pk),
+                                        data=new_content
+                                        )
 
     def delete(self):
         """Delete this report from Datasmoothie (be careful!).

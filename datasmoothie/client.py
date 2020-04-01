@@ -169,9 +169,9 @@ class Client:
         resp = json.loads(resp.content)
         report = Report(client=self,
                         title=resp['title'],
-                        primary_key=resp['pk']
+                        primary_key=resp['pk'],
+                        elements=[]
                         )
-        print(report)
         return report
 
     def list_reports(self):
@@ -193,3 +193,9 @@ class Client:
     def get_report_elements(self, primary_key):
         result = self.get_request('reportElement/{}'.format(primary_key))
         return result
+
+    def get_report(self, primary_key):
+        meta = self.get_report_meta(primary_key)
+        elements = self.get_report_elements(primary_key)
+        report = Report(self, meta['title'], elements['elements'], primary_key)
+        return report
