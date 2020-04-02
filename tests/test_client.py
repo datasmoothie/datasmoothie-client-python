@@ -60,8 +60,8 @@ def test_get_report(token):
     reports = client.list_reports()
     pk = reports['results'][0]['pk']
     report = client.get_report(pk)
-    print(report._title)
-    print(report._elements)
+    print(report.title)
+    print(report.elements)
     assert isinstance(report, Report)
 
 

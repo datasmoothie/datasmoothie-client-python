@@ -1,0 +1,41 @@
+{
+  "Type": "GroupedBarChart",
+  "Data": {
+    "normalize": true,
+    "hasOnLeft": false,
+    "view_method": "count",
+    "selectionsByDatasource": {},
+    "use_bi": false,
+    "isDirty": false,
+    "dateRes": "month",
+    "values": "needs_data_refresh",
+    "y": "@",
+    "x": [],
+    "chartOptions": {
+      "sCol": "value",
+      "defaultShowSums": false,
+      "displayStyle": ",g",
+      "normalize": true,
+      "radioName": "",
+      "tickStyle": "B",
+      "title": "",
+      "pCol": "name",
+      "showSums": false,
+      "noBarAxis": "true",
+      "sortData": "none",
+      "hideValues": [],
+      "format": "",
+      "tableLabels": [],
+      "ordinalTicks": false,
+      "barCol": 0,
+      "externalLegendPosition": "right",
+      "labelBars": true,
+      "tableValues": [],
+      "dateFormat": "%d/%m/%Y",
+      "legendText": [],
+      "caption": "",
+      "roundDigits": "0"
+    }
+  },
+  "position": 0
+}

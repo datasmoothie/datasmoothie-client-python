@@ -36,7 +36,8 @@ class Client:
         self.__api_key = api_key
         self.__headers = {
             "Authorization": "Token {}".format(self.__api_key),
-            "content-type": "application/json"
+            "Content-Type": "application/json",
+            "Accept": "application/json"
             }
 
     def _get_headers(self):
@@ -101,10 +102,10 @@ class Client:
 
     def put_request(self, resource, data):
         base_url = "https://{}".format(HOST)
-        request_path = "{}/{}".format(base_url, resource)
+        request_path = "{}/{}/".format(base_url, resource)
         result = requests.put(request_path,
                               headers=self._get_headers(),
-                              json=json.dumps(data)
+                              json=data
                               )
         return result
 
@@ -129,6 +130,12 @@ class Client:
         result = requests.delete(request_path,
                                  headers=self._get_headers())
         return result
+
+    def get_base_url(self, api=True):
+        if api:
+            return HOST
+        else:
+            return HOST.replace("api2", "")
 
     def get_datasource(self, primary_key):
         """Create a datasource object from information fetched from the API.
@@ -164,7 +171,7 @@ class Client:
         result = self.get_request('datasource')
         return result
 
-    def create_report(self, title):
+    def create_report(self, title, global_filter="default", template="none"):
         """Create a report/dashboard in Datasmoothie.
 
         Parameters
@@ -178,10 +185,13 @@ class Client:
             The created report with both meta and content (elements).
 
         """
-        resp = self.post_request('report', data={"title": title})
+        resp = self.post_request('report',
+                                 data={"title": title,
+                                       "global_filter": global_filter,
+                                       "template": template})
         resp = json.loads(resp.content)
         report = Report(client=self,
-                        title=resp['title'],
+                        meta=resp,
                         primary_key=resp['pk'],
                         elements=[]
                         )
@@ -254,5 +264,5 @@ class Client:
         """
         meta = self.get_report_meta(primary_key)
         elements = self.get_report_elements(primary_key)
-        report = Report(self, meta['title'], elements['elements'], primary_key)
+        report = Report(self, meta, elements['elements'], primary_key)
         return report
