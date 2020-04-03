@@ -4,10 +4,10 @@ import setuptools
 setuptools.setup(
     name="datasmoothie",
     packages=['datasmoothie'],
-    version="0.2",
+    version="0.3",
     licence='MIT',
     url="https://github.com/datasmoothie/datasmoothie-client-python",
-    download_url="https://github.com/datasmoothie/datasmoothie-client-python/archive/v0.2.tar.gz",
+    download_url="https://github.com/datasmoothie/datasmoothie-client-python/archive/v0.3.tar.gz",
     author="Geir Freysson",
     author_email="geir@datasmoothie.com",
     description="Python wrapper for v2 of the Datasmoothie API.",
