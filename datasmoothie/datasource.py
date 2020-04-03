@@ -27,7 +27,7 @@ class Datasource:
 
     """
 
-    def __init__(self, client, name, primary_key):
+    def __init__(self, client, meta, primary_key):
         """Initialise a Datasource.
 
         Parameters
@@ -41,7 +41,10 @@ class Datasource:
 
 
         """
-        self._name = name
+        self.survey_meta = {}
+        self.survey_data = ""
+        self.meta = meta
+        self.name = meta['name']
         self._client = client
         self._pk = primary_key
 
@@ -55,6 +58,22 @@ class Datasource:
 
         """
         return self._name
+
+    def get_meta_and_data(self):
+        """Get meta data and data for a data source.
+
+        Returns
+        -------
+        json dict
+            Returns a dict with two keys, meta and data. The meta is
+            Quantipy meta data and the data is a csv with the response data.
+
+        """
+        resp = self._client.get_request('datasource/{}'.format(self._pk),
+                                        'meta_data')
+        self.survey_meta = resp['meta']
+        self.survey_data = resp['data']
+        return resp
 
     def update_meta_and_data(self, meta, data):
         """Update the remote datasource with new meta-data and data.

@@ -153,7 +153,7 @@ class Client:
         """
         result = self.get_request('datasource/{}'.format(primary_key))
         datasource = Datasource(client=self,
-                                name=result['name'],
+                                meta=result,
                                 primary_key=result['pk'])
         return datasource
 
