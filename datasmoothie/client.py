@@ -3,8 +3,6 @@ import requests
 from .datasource import Datasource
 from .report import Report
 
-HOST = "www.datasmoothie.com/api2"
-
 
 class Client:
     """Client that makes first calls to the Datasmoothie API.
@@ -23,16 +21,25 @@ class Client:
 
     """
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, host="www.datasmoothie.com/api2", ssl=True):
         """Initialise the client with an API key.
 
         Parameters
         ----------
         api_key : string
             The API key used for authentication, provided by Datasmoothie.
-
+        host : string
+            The path to the server api
+        ssl : boolean
+            Datasmoothie does not support non ssl communication, but this is 
+            useful for development and local unit testing.
 
         """
+        self.host = host
+        if ssl:
+            self.base_url = "https://{}".format(host)
+        else:
+            self.base_url = "http://{}".format(host)
         self.__api_key = api_key
         self.__headers = {
             "Authorization": "Token {}".format(self.__api_key),
@@ -61,10 +68,9 @@ class Client:
             JSON object representing the result of the API request.
 
         """
-        base_url = "https://{}".format(HOST)
         if action is None:
             action = ""
-        request_path = "{}/{}/{}".format(base_url, resource, action)
+        request_path = "{}/{}/{}".format(self.base_url, resource, action)
         result = requests.get(request_path, headers=self._get_headers())
         result = json.loads(result.content)
         return result
@@ -92,8 +98,8 @@ class Client:
             Description of returned object.
 
         """
-        base_url = "https://{}".format(HOST)
-        request_path = "{}/{}/{}".format(base_url, resource, action)
+        
+        request_path = "{}/{}/{}".format(self.base_url, resource, action)
         result = requests.post(request_path,
                                headers=self._get_headers(),
                                data=json.dumps(data)
@@ -101,8 +107,7 @@ class Client:
         return result
 
     def put_request(self, resource, data):
-        base_url = "https://{}".format(HOST)
-        request_path = "{}/{}/".format(base_url, resource)
+        request_path = "{}/{}/".format(self.base_url, resource)
         result = requests.put(request_path,
                               headers=self._get_headers(),
                               json=data
@@ -125,17 +130,16 @@ class Client:
             The response from the server.
 
         """
-        base_url = "https://{}".format(HOST)
-        request_path = "{}/{}/{}".format(base_url, resource, primary_key)
+        request_path = "{}/{}/{}".format(self.base_url, resource, primary_key)
         result = requests.delete(request_path,
                                  headers=self._get_headers())
         return result
 
     def get_base_url(self, api=True):
         if api:
-            return HOST
+            return self.host
         else:
-            return HOST.replace("api2", "")
+            return self.host.replace("api2", "")
 
     def get_datasource(self, primary_key):
         """Create a datasource object from information fetched from the API.
