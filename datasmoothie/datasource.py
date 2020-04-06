@@ -182,3 +182,35 @@ class Datasource:
         else:
             return resp
 
+    def get_crosstab(self, stub, banner):
+        """ Calculates a single crosstab view for a stub/banner combination
+
+        Parameters
+        ----------
+        stub : list
+            List of variables on the x axis
+        banner : list
+            List of variables on the y axis
+        views : string
+            A view to calculate
+
+        Returns
+        -------
+        Pandas.DataFrame OR the response obj
+            The resulting Pandas.DataFrame or the response object if it fails
+        """
+        payload = {
+            'stub': stub,
+            'banner': banner
+        }
+        resp = self._client.post_request(resource='datasource/{}'.format(self._pk),
+                                         action="crosstab/",
+                                         data=payload
+                                        )
+        if resp.status_code == 200:
+            content = json.loads(resp.content)
+            return self.deserialize_dataframe(data=content['data'],
+                                              index=content['index'],
+                                              columns=content['columns'])
+        else:
+            return resp
