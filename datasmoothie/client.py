@@ -31,7 +31,7 @@ class Client:
         host : string
             The path to the server api
         ssl : boolean
-            Datasmoothie does not support non ssl communication, but this is 
+            Datasmoothie does not support non ssl communication, but this is
             useful for development and local unit testing.
 
         """
@@ -98,8 +98,8 @@ class Client:
             Description of returned object.
 
         """
-        
-        request_path = "{}/{}/{}".format(self.base_url, resource, action)
+
+        request_path = "{}/{}/{}/".format(self.base_url, resource, action)
         result = requests.post(request_path,
                                headers=self._get_headers(),
                                data=json.dumps(data)

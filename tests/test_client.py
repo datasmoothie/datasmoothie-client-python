@@ -36,8 +36,13 @@ def test_update_datasource(token, dataset_meta, dataset_data):
     primary_key = datasources['results'][0]['pk']
     datasource = client.get_datasource(primary_key)
     meta = dataset_meta
+    meta['info']['from_source']['pandas_reader'] = 'changed'
     data = dataset_data.to_csv()
     resp = datasource.update_meta_and_data(meta=meta, data=data)
+    datasource2 = client.get_datasource(primary_key)
+    meta_and_data = datasource2.get_meta_and_data()
+    new_meta = meta_and_data['meta']
+    assert new_meta['info']['from_source']['pandas_reader'] == 'changed'
     assert resp.status_code == 200
 
 
