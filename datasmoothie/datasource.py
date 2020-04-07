@@ -49,13 +49,16 @@ class Datasource:
         self._client = client
         self._pk = primary_key
 
-    def deserialize_dataframe(self, data, index, columns):
+    def deserialize_dataframe(self, data, index, columns,
+                              multi_index = True, multi_columns = True):
         """ Deserializes a dataframe that was serialized with orient='split'
         """
-        return pd.DataFrame(data=data,
-                            index=pd.MultiIndex.from_tuples(index),
-                            columns=pd.MultiIndex.from_tuples(columns)
-        )
+        if multi_index:
+            index = pd.MultiIndex.from_tuples(index)
+        if multi_columns:
+            columns = pd.MultiIndex.from_tuples(columns)
+
+        return pd.DataFrame(data=data, index=index, columns=columns)
 
     def name(self):
         """Get name of datasource.
@@ -134,7 +137,7 @@ class Datasource:
             'views': views
         }
         resp = self._client.post_request(resource='datasource/{}'.format(self._pk),
-                                         action="tables/",
+                                         action="tables",
                                          data=payload
                                         )
         results = {}
@@ -171,7 +174,7 @@ class Datasource:
             'view': view
         }
         resp = self._client.post_request(resource='datasource/{}'.format(self._pk),
-                                         action="table/",
+                                         action="table",
                                          data=payload
                                         )
         if resp.status_code == 200:
@@ -204,7 +207,7 @@ class Datasource:
             'banner': banner
         }
         resp = self._client.post_request(resource='datasource/{}'.format(self._pk),
-                                         action="crosstab/",
+                                         action="crosstab",
                                          data=payload
                                         )
         if resp.status_code == 200:
@@ -212,5 +215,43 @@ class Datasource:
             return self.deserialize_dataframe(data=content['data'],
                                               index=content['index'],
                                               columns=content['columns'])
+        else:
+            return resp
+
+    def apply_weight_scheme(self, name, scheme, weight_name, in_place=False):
+        """ Calculates a single crosstab view for a stub/banner combination
+
+        Parameters
+        ----------
+        stub : list
+            List of variables on the x axis
+        banner : list
+            List of variables on the y axis
+        views : string
+            A view to calculate
+
+        Returns
+        -------
+        Pandas.DataFrame OR the response obj
+            The resulting Pandas.DataFrame or the response object if it fails
+        """
+        payload = {
+            'scheme_name': name,
+            'weight_scheme': scheme,
+            'weight_name': weight_name,
+            'in_place': in_place
+        }
+        resp = self._client.post_request(resource='datasource/{}'.format(self._pk),
+                                         action="apply_weight_scheme",
+                                         data=payload)
+        if resp.status_code == 200:
+            content = json.loads(resp.content)
+            return self.deserialize_dataframe(
+                data=content['data'],
+                index=content['index'],
+                columns=content['columns'],
+                multi_index=False,
+                multi_columns=False
+            )
         else:
             return resp
