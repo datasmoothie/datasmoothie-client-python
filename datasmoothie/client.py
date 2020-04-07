@@ -99,7 +99,10 @@ class Client:
 
         """
 
-        request_path = "{}/{}/{}/".format(self.base_url, resource, action)
+        if len(action) == 0:
+            request_path = "{}/{}/".format(self.base_url, resource)
+        else:
+            request_path = "{}/{}/{}/".format(self.base_url, resource, action)
         result = requests.post(request_path,
                                headers=self._get_headers(),
                                data=json.dumps(data)

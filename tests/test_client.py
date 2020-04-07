@@ -11,19 +11,19 @@ def test_incorrect_token():
 
 
 def test_new_client(token):
-    client = Client(api_key=token)
+    client = Client(api_key=token, host="localhost:8030/api2", ssl=False)
     resp = client.get_request('datasource')
     assert 'results' in resp
 
 
 def test_list_datasources(token):
-    client = Client(api_key=token)
+    client = Client(api_key=token, host="localhost:8030/api2", ssl=False)
     resp = client.list_datasources()
     assert 'results' in resp
 
 
 def test_get_datasource(token):
-    client = Client(api_key=token)
+    client = Client(api_key=token, host="localhost:8030/api2", ssl=False)
     datasources = client.list_datasources()
     primary_key = datasources['results'][0]['pk']
     resp = client.get_datasource(primary_key)
@@ -31,7 +31,7 @@ def test_get_datasource(token):
 
 
 def test_update_datasource(token, dataset_meta, dataset_data):
-    client = Client(api_key=token)
+    client = Client(api_key=token, host="localhost:8030/api2", ssl=False)
     datasources = client.list_datasources()
     primary_key = datasources['results'][0]['pk']
     datasource = client.get_datasource(primary_key)
@@ -47,13 +47,13 @@ def test_update_datasource(token, dataset_meta, dataset_data):
 
 
 def test_list_reports(token):
-    client = Client(api_key=token)
+    client = Client(api_key=token, host="localhost:8030/api2", ssl=False)
     reports = client.list_reports()
     assert 'results' in reports
 
 
 def test_get_report_meta(token):
-    client = Client(api_key=token)
+    client = Client(api_key=token, host="localhost:8030/api2", ssl=False)
     reports = client.list_reports()
     pk = reports['results'][0]['pk']
     result = client.get_report_meta(pk)
@@ -61,7 +61,7 @@ def test_get_report_meta(token):
     assert 'pk' in result
 
 def test_get_report(token):
-    client = Client(api_key=token)
+    client = Client(api_key=token, host="localhost:8030/api2", ssl=False)
     reports = client.list_reports()
     pk = reports['results'][0]['pk']
     report = client.get_report(pk)
@@ -71,7 +71,7 @@ def test_get_report(token):
 
 
 def test_create_report(token):
-    client = Client(api_key=token)
+    client = Client(api_key=token, host="localhost:8030/api2", ssl=False)
     number_of_reports = client.list_reports()['count']
     report = client.create_report(title="api created report")
     assert client.list_reports()['count'] == number_of_reports + 1

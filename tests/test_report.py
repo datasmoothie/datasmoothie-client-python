@@ -7,7 +7,7 @@ from datasmoothie import Report
 
 
 def test_get_content(token):
-    client = Client(api_key=token)
+    client = Client(api_key=token, host="localhost:8030/api2", ssl=False)
     reports = client.list_reports()
     report = client.get_report_elements(reports['results'][0]['pk'])
     print(report)
@@ -15,14 +15,14 @@ def test_get_content(token):
 
 
 def test_get_url(token):
-    client = Client(api_key=token)
+    client = Client(api_key=token, host="localhost:8030/api2", ssl=False)
     reports = client.list_reports()
     report = client.get_report(reports['results'][0]['pk'])
-    assert "datasmoothie.com" in report.get_url()
+    assert len(report.get_url()) > 0
 
 
 def test_create_report_and_add_chart(token):
-    client = Client(api_key=token)
+    client = Client(api_key=token, host="localhost:8030/api2", ssl=False)
     datasource_pk = client.list_datasources()['results'][0]['pk']
     report = client.create_report('my test')
     original_length = len(report.elements)
@@ -35,7 +35,7 @@ def test_create_report_and_add_chart(token):
     assert 'Type' in resp
 
 def test_add_chart(token):
-    client = Client(api_key=token)
+    client = Client(api_key=token, host="localhost:8030/api2", ssl=False)
     reports = client.list_reports()
     datasources = client.list_datasources()
     datasource_id = datasources['results'][0]['pk']
