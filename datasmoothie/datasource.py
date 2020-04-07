@@ -49,13 +49,16 @@ class Datasource:
         self._client = client
         self._pk = primary_key
 
-    def deserialize_dataframe(self, data, index, columns):
+    def deserialize_dataframe(self, data, index, columns,
+                              multi_index = True, multi_columns = True):
         """ Deserializes a dataframe that was serialized with orient='split'
         """
-        return pd.DataFrame(data=data,
-                            index=pd.MultiIndex.from_tuples(index),
-                            columns=pd.MultiIndex.from_tuples(columns)
-        )
+        if multi_index:
+            index = pd.MultiIndex.from_tuples(index)
+        if multi_columns:
+            columns = pd.MultiIndex.from_tuples(columns)
+
+        return pd.DataFrame(data=data, index=index, columns=columns)
 
     def name(self):
         """Get name of datasource.
@@ -228,7 +231,7 @@ class Datasource:
             'view': view
         }
         resp = self._client.post_request(resource='datasource/{}'.format(self._pk),
-                                         action="table/",
+                                         action="table",
                                          data=payload
                                         )
         if resp.status_code == 200:
@@ -261,7 +264,7 @@ class Datasource:
             'banner': banner
         }
         resp = self._client.post_request(resource='datasource/{}'.format(self._pk),
-                                         action="crosstab/",
+                                         action="crosstab",
                                          data=payload
                                         )
         if resp.status_code == 200:
@@ -330,3 +333,43 @@ class Datasource:
         for i in self.get_survey_meta()['columns'][variable]['values']:
             mapper[i['value']] = i['text'][text_key]
         return mapper
+
+    def apply_weight_scheme(self, name, scheme, weight_name, in_place=False):
+        """ Apply a weight scheme to the dataset and store it in the meta-data.
+
+        Parameters
+        ----------
+        name : string
+            List of variables on the x axis
+        scheme : dict
+            The weight scheme, e.g. {'gender':{0:49, 1:51}, 'rural':{0:29, 1:71}}
+        weight_name : string
+            Name of the new weight variable
+        in_place : boolean
+            Update the data upstream (true) or return the weight column (false)
+
+        Returns
+        -------
+        Pandas.DataFrame OR the response obj
+            The new weight column if in_place is False, otherwise just the json response.
+        """
+        payload = {
+            'scheme_name': name,
+            'weight_scheme': scheme,
+            'weight_name': weight_name,
+            'in_place': in_place
+        }
+        resp = self._client.post_request(resource='datasource/{}'.format(self._pk),
+                                         action="apply_weight_scheme",
+                                         data=payload)
+        if resp.status_code == 200:
+            content = json.loads(resp.content)
+            return self.deserialize_dataframe(
+                data=content['data'],
+                index=content['index'],
+                columns=content['columns'],
+                multi_index=False,
+                multi_columns=False
+            )
+        else:
+            return resp
