@@ -1,4 +1,5 @@
 import json
+import os.path
 
 from datasmoothie import Client
 from datasmoothie import Report
@@ -84,3 +85,5 @@ def test_dataset_to_excel(token):
     banners = [['gender', 'agecat'], ['regular', 'purchase']]
     table_set = datasource.get_table_set(stubs, banners, ['base', 'counts', 'c%', 'stddev'])
     datasource.table_set_to_excel(table_set, 'myexcel.xlsx')
+    assert os.path.isfile('myexcel.xlsx')
+    os.remove("myexcel.xlsx")
