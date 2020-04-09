@@ -144,6 +144,15 @@ class Client:
         else:
             return self.host.replace("api2", "")
 
+    def create_datasource(self, name):
+        payload = {"name": name}
+        resp = self.post_request(resource='datasource', data=payload)
+        result = json.loads(resp.content.decode('UTF-8'))
+        datasource = Datasource(client=self,
+                                meta=result,
+                                primary_key=result['pk'])
+        return datasource
+
     def get_datasource(self, primary_key):
         """Create a datasource object from information fetched from the API.
 

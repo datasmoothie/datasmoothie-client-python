@@ -44,9 +44,20 @@ class Report():
 
     def update_meta(self, new_meta):
         payload = new_meta
+        if new_meta['global_filter'] == '':
+            new_meta['global_filter'] = "default_filter"
+        if new_meta['template'] == '':
+            new_meta['template'] = "None"
         return self._client.put_request('report/{}'.format(self._pk),
                                         data=payload
                                         )
+
+    def update_meta_element(self, element, new_value):
+        if element not in self.meta:
+            raise ValueError("{} is not in the report meta data.".format(element))
+        new_meta = self.meta
+        new_meta[element] = new_value
+        return self.update_meta(new_meta)
 
     def update_content(self, new_elements):
         """Update report elements with new element list.

@@ -34,6 +34,31 @@ def test_create_report_and_add_chart(token):
     assert len(report2.elements) == original_length + 1
     assert 'Type' in resp
 
+def test_update_meta_element(token):
+    client = Client(api_key=token, host="localhost:8030/api2", ssl=False)
+    reports = client.list_reports()
+    datasources = client.list_datasources()
+    datasource_id = datasources['results'][0]['pk']
+    report = client.get_report(reports['results'][0]['pk'])
+    meta = report.meta
+    resp = report.update_meta_element('title', 'new title')
+    assert resp.status_code == 200
+    report = client.get_report(reports['results'][0]['pk'])
+    assert report.meta['title'] == 'new title'
+
+def test_update_report_meta(token):
+    client = Client(api_key=token, host="localhost:8030/api2", ssl=False)
+    reports = client.list_reports()
+    datasources = client.list_datasources()
+    datasource_id = datasources['results'][0]['pk']
+    report = client.get_report(reports['results'][0]['pk'])
+    meta = report.meta
+    meta['title'] = 'changed'
+    resp = report.update_meta(meta)
+    assert resp.status_code == 200
+    report = client.get_report(reports['results'][0]['pk'])
+    assert report.meta['title'] == 'changed'
+
 def test_add_chart(token):
     client = Client(api_key=token, host="localhost:8030/api2", ssl=False)
     reports = client.list_reports()

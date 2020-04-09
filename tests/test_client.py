@@ -15,6 +15,10 @@ def test_new_client(token):
     resp = client.get_request('datasource')
     assert 'results' in resp
 
+def test_create_datasource(token):
+    client = Client(api_key=token, host="localhost:8030/api2", ssl=False)
+    datasource = client.create_datasource("My datasource")
+    assert isinstance(datasource, Datasource)
 
 def test_list_datasources(token):
     client = Client(api_key=token, host="localhost:8030/api2", ssl=False)
@@ -68,6 +72,14 @@ def test_get_report(token):
     print(report.title)
     print(report.elements)
     assert isinstance(report, Report)
+
+def test_delete_report(token):
+    client = Client(api_key=token, host="localhost:8030/api2", ssl=False)
+    number_of_reports = client.list_reports()['count']
+    report = client.create_report(title="api created report")
+    assert client.list_reports()['count'] == number_of_reports + 1
+    report.delete()
+    assert client.list_reports()['count'] == number_of_reports
 
 
 def test_create_report(token):
