@@ -171,6 +171,7 @@ class Client:
         datasource = Datasource(client=self,
                                 meta=result,
                                 primary_key=result['pk'])
+        datasource.survey_meta = datasource.get_meta()
         return datasource
 
     def list_datasources(self):

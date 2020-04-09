@@ -71,6 +71,45 @@ class Datasource:
         """
         return self._name
 
+    def get_meta(self):
+        """Get survey meta data.
+
+        Returns
+        -------
+        json
+            Meta data for the survey. Includes question labels etc.
+
+        """
+        resp = self._client.get_request('datasource/{}'.format(self._pk),
+                                        'meta')
+        return resp
+
+    def get_variables(self, type=None):
+        """Get a list of the variables in the datasource.
+
+        Parameters
+        ----------
+        type : string
+            Get only a certain type of variable (single, int, float, delimited set).
+
+        Returns
+        -------
+        list
+            A list of variable names.
+
+        """
+        try:
+            result = []
+            for variable in list(self.survey_meta['columns'].keys()):
+                if type is not None:
+                    if self.survey_meta['columns'][variable]['type'] == type:
+                        result.append(variable)
+                else:
+                    result.append(variable)
+            return result
+        except Exception as e:
+            raise "Datasource doesn't have any meta data yet."
+
     def get_meta_and_data(self):
         """Get meta data and data for a data source.
 
