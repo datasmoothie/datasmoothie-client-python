@@ -53,7 +53,6 @@ def test_update_datasource(token, dataset_meta, dataset_data):
     new_meta = meta_and_data['meta']
     new_data = meta_and_data['data']
     new_data_df = pd.read_csv(StringIO(new_data))
-    import pdb; pdb.set_trace()
 
 
     assert new_meta['info']['from_source']['pandas_reader'] == 'changed'
