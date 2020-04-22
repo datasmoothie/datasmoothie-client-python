@@ -1,1 +1,1 @@
-include datasmoothie/templates/chart.json
+include datasmoothie/templates/*.json
