@@ -145,6 +145,19 @@ class Client:
             return self.host.replace("api2", "")
 
     def create_datasource(self, name):
+        """Create a datasource in the Datasmoothie cloud.
+
+        Parameters
+        ----------
+        name : string
+            Name of the datasource.
+
+        Returns
+        -------
+        datasource
+            A datasmoothie.Datasource object.
+
+        """
         payload = {"name": name}
         resp = self.post_request(resource='datasource', data=payload)
         result = json.loads(resp.content.decode('UTF-8'))

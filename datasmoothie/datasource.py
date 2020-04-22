@@ -60,6 +60,19 @@ class Datasource:
 
         return pd.DataFrame(data=data, index=index, columns=columns)
 
+    def get_id(self):
+        """Get the id of this datasource.
+
+        The id is needed when charts are added to reports.
+
+        Returns
+        -------
+        int
+            The unique id number identifying this datasource in Datasmoothie.
+
+        """
+        return self._pk
+
     def name(self):
         """Get name of datasource.
 
