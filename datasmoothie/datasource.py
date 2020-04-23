@@ -255,3 +255,26 @@ class Datasource:
             )
         else:
             return resp
+
+
+    def get_sig_diff(self, stub, banner, filter="no_filter", level='mid'):
+        """ sig diff
+        """
+        payload = {
+            'stub': stub,
+            'banner': banner,
+            'filter': filter,
+            'level': level
+        }
+        resp = self._client.post_request(resource='datasource/{}'.format(self._pk),
+                                         action="sig_diff",
+                                         data=payload)
+        if resp.status_code == 200:
+            content = json.loads(resp.content)
+            return self.deserialize_dataframe(
+                data=content['data'],
+                index=content['index'],
+                columns=content['columns']
+            )
+        else:
+            return resp
