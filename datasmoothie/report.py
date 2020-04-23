@@ -138,11 +138,46 @@ class Report():
                                         "@{}".format(self.meta['account']),
                                         self.meta['slug'])
 
+    def add_charts(self,
+                  datasource_primary_key,
+                  x_y_pairs=[],
+                  chart_type="StackedBarChart"
+                  ):
+        """Add multiple charts to the report.
+
+        Use this method rather than add_chart to add multiple charts at once
+        as it is much faster. It adds all the charts to the report and updates
+        the server once, whereas add_chart updates the server after each chart.
+
+        Parameters
+        ----------
+        datasource_primary_key : type
+            Description of parameter `datasource_primary_key`.
+        x_y_pairs :
+            List of tuples, e.g. [('q1', 'gender'), ('q2', 'gender'), ('q3', '@')]
+        chart_type : type
+            Chart type. Allowed types are StackedBarChart, StackedChartHor.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
+        for variable_pair in x_y_pairs:
+            self.add_chart(datasource_primary_key=datasource_primary_key,
+                           x=variable_pair[0],
+                           y=variable_pair[1],
+                           chart_type=chart_type,
+                           update_server=False)
+        self.update_content(self.elements)
+
     def add_chart(self,
                   datasource_primary_key,
                   x,
                   y="@",
                   chart_type="StackedBarChart",
+                  update_server=True
                   ):
         """Add a chart to the report.
 
@@ -196,5 +231,7 @@ class Report():
         new_element_json['Data']['selectionsByDatasource'] = selection
         new_elements = self.elements
         new_elements.append(new_element_json)
-        self.update_content(new_elements)
+        self.elements = new_elements
+        if update_server:
+            self.update_content(new_elements)
         return new_element_json
