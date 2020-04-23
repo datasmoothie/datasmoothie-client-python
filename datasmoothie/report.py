@@ -1,5 +1,12 @@
 import json
 import time
+try:
+    import importlib.resources as pkg_resources
+except ImportError:
+    # Try backported to PY<37 `importlib_resources`.
+    import importlib_resources as pkg_resources
+
+from . import templates  # relative-import the *package* containing the templates
 
 class Report():
     """Represents a report object in datasource.
@@ -43,10 +50,48 @@ class Report():
         return self._client.get_request('reportElement/{}'.format(self._pk))
 
     def update_meta(self, new_meta):
+        """Update the report's meta data.
+
+        Used to update the entire meta data object. Use update_element to
+        update just one element.
+
+        Parameters
+        ----------
+        new_meta : dict
+            The meta data that should replace the current meta data.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         payload = new_meta
+        if new_meta['global_filter'] == '':
+            new_meta['global_filter'] = "default_filter"
+        if new_meta['template'] == '':
+            new_meta['template'] = "None"
         return self._client.put_request('report/{}'.format(self._pk),
                                         data=payload
                                         )
+
+    def update_meta_element(self, element, new_value):
+        """Update a single element in the report's meta data.
+
+        Parameters
+        ----------
+        element : string
+            The name of the element.
+        new_value : string
+            The new value of the element.
+
+
+        """
+        if element not in self.meta:
+            raise ValueError("{} is not in the report meta data.".format(element))
+        new_meta = self.meta
+        new_meta[element] = new_value
+        return self.update_meta(new_meta)
 
     def update_content(self, new_elements):
         """Update report elements with new element list.
@@ -80,6 +125,14 @@ class Report():
                                            primary_key=self._pk)
 
     def get_url(self):
+        """Get url of the report on datasmoothie.com.
+
+        Returns
+        -------
+        string
+            The link to the report.
+
+        """
         base_url = self._client.get_base_url(api=False)
         return "https://{}{}/{}/".format(base_url,
                                         "@{}".format(self.meta['account']),
@@ -128,7 +181,7 @@ class Report():
         new_meta = self.meta
         self.update_meta(new_meta)
         new_element_json = {}
-        with open('datasmoothie/templates/chart.json') as file:
+        with pkg_resources.open_text(templates, 'chart.json') as file:
             new_element_json = json.load(file)
         new_element_json['position'] = len(self.elements) + 1
         new_element_json['rowid'] = int(time.time()*1000)
