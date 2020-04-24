@@ -141,7 +141,8 @@ class Report():
     def add_charts(self,
                   datasource_primary_key,
                   x_y_pairs=[],
-                  filters=[],
+                  user_filters=[],
+                  filter=None,
                   comparison_variables=[],
                   chart_type="StackedBarChart",
                   charts_per_row=1):
@@ -153,11 +154,16 @@ class Report():
 
         Parameters
         ----------
-        datasource_primary_key : type
+        datasource_primary_key : int
             Description of parameter `datasource_primary_key`.
         x_y_pairs :
             List of tuples, e.g. [('q1', 'gender'), ('q2', 'gender'), ('q3', '@')]
-        chart_type : type
+        filter : string
+            Filter to apply to the chart. The user can't control this and will only
+            ever see the data with this filter applied.
+        user_filters : list of strings
+            What variables the user can filter across with an interactive dropdown.
+        chart_type : string
             Chart type. Allowed types are StackedBarChart, StackedChartHor.
 
         Returns
@@ -172,7 +178,8 @@ class Report():
             self.add_chart(datasource_primary_key=datasource_primary_key,
                            x=variable_pair[0],
                            y=variable_pair[1],
-                           filters=filters,
+                           filter=filter,
+                           user_filters=user_filters,
                            comparison_variables=comparison_variables,
                            chart_type=chart_type,
                            update_server=False,
@@ -187,7 +194,8 @@ class Report():
                   chart_type="StackedBarChart",
                   update_server=True,
                   comparison_variables=[],
-                  filters=[],
+                  filter=None,
+                  user_filters=[],
                   same_line_as_previous=False,
                   language_key=None
                   ):
@@ -208,6 +216,15 @@ class Report():
         y : string
             A variable to use as a crosstab for the chart,
             e.g. 'age_groups'.
+        title : string
+            Title to display above the chart. If left empty, an attempt will be made
+            to use the label from the  meta data.
+        filter : string
+            Filter to apply to the chart, in pandas notation, e.g. (gender == 1) where
+            gender is the variable name and 1 is the code. The end-user can't control this
+            and will only ever see the data with this filter applied.
+        user_filters : list of strings
+            What variables the user can filter across with an interactive dropdown.
         chart_type : string
             Chart type to use.
         update_server : boolean
@@ -245,9 +262,11 @@ class Report():
         new_element_json['Type'] = chart_type
         new_element_json['Data']['y'] = y
         new_element_json['Data']['x'] = x
+        if filter is not None:
+            new_element_json['Data']['filter'] = filter
         if same_line_as_previous:
             new_element_json['Data']['hasOnLeft'] = True
-        new_element_json['Data']['chartOptions']['filters'] = filters
+        new_element_json['Data']['chartOptions']['filters'] = user_filters
         new_element_json['Data']['chartOptions']['comparisonvars'] = comparison_variables
         if title is None:
             survey_meta = datasource.get_survey_meta()

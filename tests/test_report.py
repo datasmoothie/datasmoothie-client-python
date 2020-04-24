@@ -71,7 +71,7 @@ def test_add_chart(token):
     report = client.get_report(reports['results'][0]['pk'])
     assert len(report.elements) == original_length + 1
 
-def test_add_multipl_charts(token):
+def test_add_multiple_charts(token):
     client = Client(api_key=token, host="localhost:8030/api2", ssl=False)
     reports = client.list_reports()
     datasources = client.list_datasources()
@@ -87,7 +87,8 @@ def test_add_multipl_charts(token):
                                 ('quality', '@'),
                                 ('quality', '@'),
                                 ('quality', '@')],
-                     filters=['gender', 'agecat'],
+                     user_filters=['gender', 'agecat'],
+                     filter=['gender == 1'],
                      comparison_variables=['agecat'],
                      charts_per_row=3)
     report = client.get_report(report._pk)
