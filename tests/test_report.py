@@ -79,6 +79,16 @@ def test_add_charts(token):
     report = client.get_report(reports['results'][0]['pk'])
     original_length = len(report.elements)
     report.add_charts(datasource_primary_key=datasource_id,
-                     x_y_pairs=[('price', 'gender'), ('quality', '@')])
-    report = client.get_report(reports['results'][0]['pk'])
-    assert len(report.elements) == original_length + 2
+                     x_y_pairs=[('price', 'gender'),
+                                ('quality', '@'),
+                                ('service', '@'),
+                                ('distance', '@'),
+                                ('quality', '@'),
+                                ('quality', '@'),
+                                ('quality', '@'),
+                                ('quality', '@')],
+                     filters=['gender', 'agecat'],
+                     comparison_variables=['agecat'],
+                     charts_per_row=3)
+    report = client.get_report(report._pk)
+    assert len(report.elements) == original_length + 8

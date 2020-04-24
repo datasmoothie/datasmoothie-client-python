@@ -358,6 +358,8 @@ class Datasource:
             new_list.append((variable, value))
         return pd.MultiIndex.from_tuples(new_list, names=["Questions", "Values"])
 
+    def get_default_language(self):
+        return self.survey_meta['lib']['default text']
 
     def text(self, name, text_key=None):
         """

@@ -141,8 +141,10 @@ class Report():
     def add_charts(self,
                   datasource_primary_key,
                   x_y_pairs=[],
-                  chart_type="StackedBarChart"
-                  ):
+                  filters=[],
+                  comparison_variables=[],
+                  chart_type="StackedBarChart",
+                  charts_per_row=1):
         """Add multiple charts to the report.
 
         Use this method rather than add_chart to add multiple charts at once
@@ -164,20 +166,30 @@ class Report():
             Description of returned object.
 
         """
-        for variable_pair in x_y_pairs:
+        for index, variable_pair in enumerate(x_y_pairs):
+            # 2 charts per row, this is true on 2, 4, 6, 8 etc.
+            same_line_as_previous = (index % charts_per_row > 0 )
             self.add_chart(datasource_primary_key=datasource_primary_key,
                            x=variable_pair[0],
                            y=variable_pair[1],
+                           filters=filters,
+                           comparison_variables=comparison_variables,
                            chart_type=chart_type,
-                           update_server=False)
+                           update_server=False,
+                           same_line_as_previous=same_line_as_previous)
         self.update_content(self.elements)
 
     def add_chart(self,
                   datasource_primary_key,
                   x,
                   y="@",
+                  title=None,
                   chart_type="StackedBarChart",
-                  update_server=True
+                  update_server=True,
+                  comparison_variables=[],
+                  filters=[],
+                  same_line_as_previous=False,
+                  language_key=None
                   ):
         """Add a chart to the report.
 
@@ -198,6 +210,13 @@ class Report():
             e.g. 'age_groups'.
         chart_type : string
             Chart type to use.
+        update_server : boolean
+            Update the server with the new element or just do it locally.
+            If it's only local, you need to call self.update_content(new_elements)
+            manually.
+        same_line_as_previous : boolean
+            Should this chart be in the same line as the previous chart, on
+            the right? Don't do this for the first chart you add.
 
         Returns
         -------
@@ -216,6 +235,9 @@ class Report():
         new_meta = self.meta
         self.update_meta(new_meta)
         new_element_json = {}
+        datasource = self._client.get_datasource(datasource_primary_key)
+        if language_key is None:
+            language_key = datasource.get_default_language()
         with pkg_resources.open_text(templates, 'chart.json') as file:
             new_element_json = json.load(file)
         new_element_json['position'] = len(self.elements) + 1
@@ -223,6 +245,18 @@ class Report():
         new_element_json['Type'] = chart_type
         new_element_json['Data']['y'] = y
         new_element_json['Data']['x'] = x
+        if same_line_as_previous:
+            new_element_json['Data']['hasOnLeft'] = True
+        new_element_json['Data']['chartOptions']['filters'] = filters
+        new_element_json['Data']['chartOptions']['comparisonvars'] = comparison_variables
+        if title is None:
+            survey_meta = datasource.get_survey_meta()
+            if x in survey_meta['columns']:
+                title_from_meta = survey_meta['columns'][x]['text'][language_key]
+                new_element_json['Data']['chartOptions']['title'] = title_from_meta
+        else:
+            new_element_json['Data']['chartOptions']['title'] = title
+
         selection = {}
         selection[datasource_primary_key] = {"x": x,
                                              "y": y,
