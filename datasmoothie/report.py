@@ -251,7 +251,7 @@ class Report():
         new_element_json['Data']['chartOptions']['comparisonvars'] = comparison_variables
         if title is None:
             survey_meta = datasource.get_survey_meta()
-            if x in survey_meta['columns']:
+            if type(x) != list and x in survey_meta['columns']:
                 title_from_meta = survey_meta['columns'][x]['text'][language_key]
                 new_element_json['Data']['chartOptions']['title'] = title_from_meta
         else:
