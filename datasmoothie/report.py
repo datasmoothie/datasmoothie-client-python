@@ -172,6 +172,7 @@ class Report():
             Description of returned object.
 
         """
+        datasource = self._client.get_datasource(datasource_primary_key)
         for index, variable_pair in enumerate(x_y_pairs):
             # 2 charts per row, this is true on 2, 4, 6, 8 etc.
             same_line_as_previous = (index % charts_per_row > 0 )
@@ -183,7 +184,8 @@ class Report():
                            comparison_variables=comparison_variables,
                            chart_type=chart_type,
                            update_server=False,
-                           same_line_as_previous=same_line_as_previous)
+                           same_line_as_previous=same_line_as_previous,
+                           datasource=datasource)
         self.update_content(self.elements)
 
     def add_chart(self,
@@ -197,7 +199,8 @@ class Report():
                   filter=None,
                   user_filters=[],
                   same_line_as_previous=False,
-                  language_key=None
+                  language_key=None,
+                  datasource=None
                   ):
         """Add a chart to the report.
 
@@ -252,7 +255,8 @@ class Report():
         new_meta = self.meta
         self.update_meta(new_meta)
         new_element_json = {}
-        datasource = self._client.get_datasource(datasource_primary_key)
+        if datasource is None:
+            datasource = self._client.get_datasource(datasource_primary_key)
         if language_key is None:
             language_key = datasource.get_default_language()
         with pkg_resources.open_text(templates, 'chart.json') as file:
